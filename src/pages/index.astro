@@ -1,21 +1,80 @@
 ---
-import PlotFigure from "../components/PlotFigure.astro";
 import Layout from "../layouts/Layout.astro";
-import * as Plot from "@observablehq/plot";
 import penguins from "../assets/penguins.json";
+import Graphicspecies from "../components/Graphspecies.astro";
+
+// Liste unique des espèces
+const species = [...new Set(penguins.map((p) => p.species))].sort();
 ---
 
-<Layout>
-  <h1 class="text-2xl">Test Astro et Plot (Observablehq)</h1>
-  <PlotFigure
-    options={{
-      marks: [
-        Plot.dot(penguins, {
-          x: "culmen_length_mm",
-          y: "culmen_depth_mm",
-          stroke: "species",
-        }),
-      ],
-    }}
-  />
+<Layout title="Statistiques des manchots">
+  <div class="px-4 py-2">
+<nav class="bg-gradient-to-r from-black via-gray-900 to-black text-pink-300 p-4 rounded-2xl shadow-[0_0_20px_rgba(80,0,0,0.5)] border border-red-900/40">
+  <div class="max-w-5xl mx-auto flex justify-between items-center">
+    <h2 class="text-2xl font-semibold tracking-wide text-pink-300 drop-shadow-[0_0_8px_rgba(255,0,0,0.4)]">
+      Navigation
+    </h2>
+    <ul class="flex space-x-6">
+      <li>
+        <a href="/penguins-dynamique/" 
+           class="relative text-pink-300 hover:text-pink-200 transition duration-300 pb-1 
+                  after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-pink-300 after:transition-all after:duration-300 hover:after:w-full">
+          Rendu dynamique
+        </a>
+      </li>
+      <li>
+        <a href="/penguins-statique/" 
+           class="relative text-pink-300 hover:text-pink-200 transition duration-300 pb-1 
+                  after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-pink-300 after:transition-all after:duration-300 hover:after:w-full">
+          Rendu statique
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+    <label
+      for="speciesSelect"
+      class="block mb-2 text-lg font-semibold text-gray-100"
+    >
+      Choisissez une espèce :
+    </label>
+    <select
+      id="speciesSelect"
+      class="p-2 rounded-md bg-black text-pink-300 border !border-pink-200 focus:!outline-none focus:!ring-2 focus:!ring-pink-400 mb-4"
+    >
+      <option value="">Sélectionnez espèce</option>
+      {
+        species.map((name) => (
+          <option value={name.toLowerCase()}>{name}</option>
+        ))
+      }
+    </select>
+  </div>
+
+  <div class="flex overflow-x-auto scroll-smooth snap-x snap-mandatory">
+    {
+      species.map((name) => (
+        <section
+          class="min-w-full snap-start rounded-xl border border-pink-200 bg-grey-700 shadow-sm"
+          id={name.toLowerCase()}
+        >
+          <h2 class="mb-2 text-2xl font-semibold px-8">{name}</h2>
+          <div class="w-full flex px-12">
+            <Graphicspecies species={name} />
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <script>
+    document
+      .querySelector("#speciesSelect")
+      ?.addEventListener("change", (evt) => {
+        const value = evt.target.value;
+        if (value) {
+          location.hash = `#${value}`;
+        }
+      });
+  </script>
 </Layout>
